@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "SpeedTest": {
+      "title": "SpeedTest",
+      "description": "A record of an internet speed test.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who performed the test."
+        },
+        "downloadMbps": {
+          "type": "number",
+          "description": "Download speed in Mbps."
+        },
+        "uploadMbps": {
+          "type": "number",
+          "description": "Upload speed in Mbps."
+        },
+        "pingMs": {
+          "type": "number",
+          "description": "Latency in milliseconds."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the test was performed."
+        },
+        "deviceType": {
+          "type": "string",
+          "description": "Type of device used (e.g., mobile, desktop)."
+        },
+        "gamingScore": {
+          "type": "number",
+          "description": "Calculated score for gaming."
+        },
+        "streamingScore": {
+          "type": "number",
+          "description": "Calculated score for streaming."
+        },
+        "videoCallScore": {
+          "type": "number",
+          "description": "Calculated score for video calls."
+        }
+      },
+      "required": ["userId", "downloadMbps", "uploadMbps", "pingMs", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/speedTests/{testId}": {
+      "schema": {
+        "$ref": "#/entities/SpeedTest"
+      },
+      "description": "Stores all speed test records."
+    }
+  }
+}

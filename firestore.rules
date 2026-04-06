@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: speedTests
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - downloadMbps: number (required)
+    //   - uploadMbps: number (required)
+    //   - pingMs: number (required)
+    //   - timestamp: timestamp (required)
+    //   - deviceType: string (optional)
+    //   - gamingScore: number (optional)
+    //   - streamingScore: number (optional)
+    //   - videoCallScore: number (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidSpeedTest() {
+      let data = request.resource.data;
+      return hasRequiredFields(['userId', 'downloadMbps', 'uploadMbps', 'pingMs', 'timestamp']) &&
+             hasOnlyAllowedFields(['userId', 'downloadMbps', 'uploadMbps', 'pingMs', 'timestamp', 'deviceType', 'gamingScore', 'streamingScore', 'videoCallScore']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.downloadMbps is number && data.downloadMbps >= 0 &&
+             data.uploadMbps is number && data.uploadMbps >= 0 &&
+             data.pingMs is number && data.pingMs >= 0 &&
+             data.timestamp is timestamp &&
+             (!('deviceType' in data) || data.deviceType is string) &&
+             (!('gamingScore' in data) || data.gamingScore is number) &&
+             (!('streamingScore' in data) || data.streamingScore is number) &&
+             (!('videoCallScore' in data) || data.videoCallScore is number);
+    }
+
+    match /speedTests/{testId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidSpeedTest();
+      allow update: if false; // Speed tests should be immutable
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

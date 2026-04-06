@@ -1,0 +1,5 @@
+{
+  "name": "Smart Speed Test",
+  "description": "A smart internet speed test and insights platform that measures download, upload, and ping, provides real-life usage scores, and tracks history.",
+  "requestFramePermissions": []
+}
